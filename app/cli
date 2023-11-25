@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+'use strict'
+
+const App = require("."), args = process.argv.slice(2)
+var arg
+while (arg = args.shift()) {
+    if (arg.startsWith("--")) {
+        if (arg.startsWith("--www-directory=")) {
+            App.setWWWDir(arg.substring("--www-directory=".length))
+            continue
+        }
+        else {
+            console.log(`'Option ${arg}' is unrecognizable.`)
+            break
+        }
+    }
+    else if (arg.startsWith("-")) {
+        if (arg === "-wd") {
+            App.setWWWDir(args.shift())
+        }
+        else {
+            console.log(`'${arg}' is not a phloemjs option.`)
+            break
+        }
+        continue
+    }
+
+    if (arg === "setup") {
+        App.setup()
+        break
+    }
+    else if (arg === "run") {
+        if ((arg = args.shift()) === "-p") App.setPort(args.shift())
+        App.run()
+        break
+    }
+    else {
+        console.log(`'${arg}' is not a phloemjs command.`)
+        break
+    }
+}

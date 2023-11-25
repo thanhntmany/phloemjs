@@ -1,4 +1,4 @@
-import phloemjs from "../server-side.mjs"
+import phloemjs from "../phloe.mjs"
 
 
 export default new phloemjs.HTMLAr(

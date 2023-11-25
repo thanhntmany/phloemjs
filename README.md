@@ -16,11 +16,12 @@ npm install -g https://github.com/thanhntmany/phloemjs
 phloem [options] <command>
 
 Options:
-  -rd <directory>|--root-directory=<directory>
+  -wd <directory>|--www-directory=<directory>
+                    Select www folder (default: current working directory)
 
 Command:
-    setup    Setup root files at root directory (default: current working directory)
-    run      Run static website
+    setup           Setup root files at root directory
+    run [-p <port>] Run static website (on <port>)
 ```
 
 ## 2-Side (Backend + Frontend)
