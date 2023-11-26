@@ -5,8 +5,8 @@ const App = require("."), args = process.argv.slice(2)
 var arg
 while (arg = args.shift()) {
     if (arg.startsWith("--")) {
-        if (arg.startsWith("--www-directory=")) {
-            App.setWWWDir(arg.substring("--www-directory=".length))
+        if (arg.startsWith("--working-directory=")) {
+            App.setWD(arg.substring("--working-directory=".length))
             continue
         }
         else {
@@ -16,7 +16,7 @@ while (arg = args.shift()) {
     }
     else if (arg.startsWith("-")) {
         if (arg === "-wd") {
-            App.setWWWDir(args.shift())
+            App.setWD(args.shift())
         }
         else {
             console.log(`'${arg}' is not a phloemjs option.`)
@@ -25,11 +25,20 @@ while (arg = args.shift()) {
         continue
     }
 
-    if (arg === "setup") {
+    if (arg === "init") {
+        App.init()
+        break
+    }
+    else if (arg === "setup") {
         App.setup()
         break
     }
     else if (arg === "run") {
+        if ((arg = args.shift()) === "-p") App.setPort(args.shift())
+        App.run()
+        break
+    }
+    else if (arg === "build") {
         if ((arg = args.shift()) === "-p") App.setPort(args.shift())
         App.run()
         break

@@ -3,45 +3,64 @@
 This framework is built with the idea that we stil work based on available platform. (Browsers, Devices, Network topology...)
 
 
-## Installing
-```
+## Installing phloemjs
+```bash
 npm install -g https://github.com/thanhntmany/phloemjs
 ```
 
-# Usage
+## Setup project
+```bash
+# Firstly, cd into project directory.
+phloemjs init
+phloemjs run
+```
 
 ## CLI
 
 ```bash
-phloem [options] <command>
+phloemjs [options] <command>
 
 Options:
-  -wd <directory>|--www-directory=<directory>
-                    Select www folder (default: current working directory)
-
-Command:
-    setup           Setup root files at root directory
-    run [-p <port>] Run static website (on <port>)
+    -wd <directory>|--working-directory=<directory>
+                          Select working directory (default: current working directory)
+Commands:
+    init                  Initialize project
+    run [-p <port>]       Run static website (on <port>, default: 3080)
+    build [<pathspec>...] Scan and render by builders (*.builder.mjs)
 ```
 
 ## 2-Side (Backend + Frontend)
 
-### Import:
-
-*ESM*
 ```javascript
+/* @ModuleID: "www/phloe.mjs" */
+
+
+// ESM
 import phloemjs from "www/phloe.mjs";
-```
+// operations
 
-*Dynamic Import*
-```javascript
+
+// Dynamic Import
 import("www/phloe.mjs").then((phloemjs_module) => {
     const phloemjs = phloemjs_module.default
-
     // operations
-
 });
 ```
+
+```html
+<!-- Frontend (Browser) -->
+<head>
+  <script type="importmap">{"imports": {"www/": "/"}}</script>
+  <script type="module" src="/phloe.mjs"></script>
+  <!-- 2 lines above are automatically added into HTML code while using HTMLAr -->
+</head>
+
+<script>
+  const const { StringAr } = phloemjs; // phloemjs has already been in global
+  // operations
+</script>
+```
+
 
 ### Features:
 
@@ -51,27 +70,20 @@ import("www/phloe.mjs").then((phloemjs_module) => {
 const { StringAr } = phloemjs;
 
 // init template
-const sample_template = new StringAr(`Sample {placeholder_abc}, end template.`);
+const template = new StringAr(`Sample {{placeholder_abc}}, end.`);
 
 //Assign data
-sample_template.$.placeholder_abc = "DEF"
-
-//Render
-console.log(sample_template.toString())
-// Sample DEF, end template.
-console.log("" + sample_template)
-// Sample DEF, end template.
+template.$.placeholder_abc = "DEF"
+console.log(template.toString())  // Sample DEF, end.
+console.log("" + template)        // Sample DEF, end.
 
 // Assign new data
-sample_template.$.placeholder_abc = "GHI"
-//Render
-console.log(sample_template.toString())
-// Sample GHI, end template.
-console.log("" + sample_template)
-// Sample GHI, end template.
+template.$.placeholder_abc = "GHI"
+console.log(template.toString())  // Sample GHI, end.
+console.log("" + template)        // Sample GHI, end.
 ```
 
-#### dir [WIP]
+#### dir
 ```javascript
 phloemjs.dir('/abc/def/ghi/'); //Returns: '/abc/def/ghi'
 phloemjs.dir('/abc/def/ghi'); //Returns: '/abc/def'
@@ -107,38 +119,21 @@ phloemjs.HTML
 ```
 [WIP]
 
-## Frontend (Browser)
 
-```html
-// Setup
-<head>
-  <script type="importmap">{"imports": {"www/": "/"}}</script>
-  <script type="module" src="/phloe.mjs"></script>
-</head>
-
-// Run
-<script>
-// phloemjs has already been in global
-const const { StringAr } = phloemjs;
-// operations
-
-</script>
-```
-
-## Backend
-
-*ESM*
+## Just in Backend
 ```javascript
+/* @ModuleID: "phloemjs/phloe.mjs" */
+
+// ESM
 import phloemjs from "phloemjs/phloe.mjs";
-```
 
-*CommonJS*
-```javascript
+// CommonJS
 const phloemjs = require("phloemjs");
 ```
 
-### **NOTE:** The *backend* `phloemjs` has all feature of *2-Side* `phloemjs`
-#### HTMLAr
+### HTMLAr
 ```javascript
-phloemjs.HTMLAr
+const { HTMLAr } = phloemjs;
+
+// #TODO: test and add example here
 ```

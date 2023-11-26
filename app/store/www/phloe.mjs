@@ -10,7 +10,7 @@ class StringAr {
  HTMLgetRequireList(L, L1) { var l1 = (L1 || (L1 = new Set())).size; this._r(L1); if ((l1 -= L1.size) < 0) { var l = (L || (L = new Set())).size;[...L1].slice(l1).forEach(SSaE, L); if ((l -= L.size) < 0) return [...L].slice(l) } return [] }
  _f() { return this._.map(_f, this.$) }
  toString(S) { return this._f().flat(Infinity).join(S0) }
- c($) { return new this.constructor(this, $) }
+ clone($) { return new this.constructor(this, $) }
 }
 const pRe = /({{[\S]+?}})/g, SA = StringAr,
  sa = function (e, i, a) { if (e.match(pRe)) a[i] = { k: e.slice(2, -2) } },
