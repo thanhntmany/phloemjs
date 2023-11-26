@@ -124,16 +124,22 @@ phloemjs.HTML
 ```javascript
 /* @ModuleID: "phloemjs/phloe.mjs" */
 
+
 // ESM
 import phloemjs from "phloemjs/phloe.mjs";
+// operations
 
-// CommonJS
-const phloemjs = require("phloemjs");
+
+// Dynamic Import
+import("www/phloe.mjs").then((phloemjs_module) => {
+    const phloemjs = phloemjs_module.default
+    // operations
+});
+
 ```
 
 ### HTMLAr
 ```javascript
 const { HTMLAr } = phloemjs;
-
 // #TODO: test and add example here
 ```

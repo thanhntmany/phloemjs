@@ -1,16 +1,21 @@
 #!/usr/bin/env node
 'use strict'
 
+const { isAbsolute, join } = require("node:path"),
+    { statSync } = require("node:fs"), statSyncOps = { throwIfNoEntry: false }
+
+
 const App = require("."), args = process.argv.slice(2)
 var arg
 while (arg = args.shift()) {
     if (arg.startsWith("--")) {
+        if (arg.length === 2) continue
         if (arg.startsWith("--working-directory=")) {
             App.setWD(arg.substring("--working-directory=".length))
             continue
         }
         else {
-            console.log(`'Option ${arg}' is unrecognizable.`)
+            console.warn(`'Option ${arg}' is unrecognizable.`)
             break
         }
     }
@@ -19,7 +24,7 @@ while (arg = args.shift()) {
             App.setWD(args.shift())
         }
         else {
-            console.log(`'${arg}' is not a phloemjs option.`)
+            console.warn(`'${arg}' is not a phloemjs option.`)
             break
         }
         continue
@@ -27,11 +32,9 @@ while (arg = args.shift()) {
 
     if (arg === "init") {
         App.init()
-        break
     }
     else if (arg === "setup") {
         App.setup()
-        break
     }
     else if (arg === "run") {
         if ((arg = args.shift()) === "-p") App.setPort(args.shift())
@@ -39,12 +42,23 @@ while (arg = args.shift()) {
         break
     }
     else if (arg === "build") {
-        if ((arg = args.shift()) === "-p") App.setPort(args.shift())
-        App.run()
-        break
+        const wd = App.wd
+        if (args.length === 0) args.push(wd)
+        var p, stat
+        while (p = args.shift()) {
+            if (p === "--") break
+            if (!isAbsolute(p)) p = join(wd, p)
+            if (stat = statSync(p, statSyncOps)) {
+                if (stat.isDirectory()) {
+                    App.buildInDirectory(p)
+                }
+                else App.buildByBuilder(p)
+            }
+            else console.warn(`Could not load builder from "${p}"`)
+        }
     }
     else {
-        console.log(`'${arg}' is not a phloemjs command.`)
+        console.warn(`'${arg}' is not a phloemjs command.`)
         break
     }
 }

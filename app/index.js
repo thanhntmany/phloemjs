@@ -1,8 +1,9 @@
 'use strict'
-const { dirname, isAbsolute, join } = require('node:path'),
-    { constants, copyFileSync, statSync, readdirSync, realpathSync, rmSync } = require('node:fs'),
+const { dirname, isAbsolute, join, sep } = require('node:path'),
+    { constants, copyFileSync, statSync, readdirSync, realpathSync, rmSync, writeFileSync } = require('node:fs'),
     readdirSyncOps = { recursive: true },
-    rmOps = { force: true }
+    rmOps = { force: true },
+    statSyncOps = { throwIfNoEntry: false }
 
 const BuilderSuffix = ".builder.mjs",
     _endsWith = function (e) { return e.endsWith(this) }
@@ -15,13 +16,14 @@ module.exports = exports = {
 
     setWD: function (p) {
         this.wd = isAbsolute(p) ? p : join(this.wd, p)
+        this.wwwDir = undefined
         return this
     },
 
     findWWWDir: function () {
         if (this.wwwDir) return this.wwwDir
 
-        const NMs = join("node_modules", "www"), statSyncOps = { throwIfNoEntry: false }
+        const NMs = join("node_modules", "www")
         var wd = this.wd, p, stat
         do {
             if ((stat = statSync(p = join(wd, NMs), statSyncOps)) && stat.isDirectory()) return this.wwwDir = realpathSync(p)
@@ -38,25 +40,27 @@ module.exports = exports = {
     },
 
     files: {
-        packageJson: join(__dirname, "store", "www", "package.json"),
         phloemjs: join(__dirname, "store", "www", "phloe.mjs")
     },
 
     init: function () {
         require('child_process').execSync(
-            `npm init -y && mkdir -p app/www && npm init -y -w ./app/www`,
+            `npm init -y && npm i ${dirname(__dirname)} && mkdir -p app/www && npm init -y -w ./app/www`,
             { cwd: this.wd }
         )
         this.setup()
+        const wwwDir = this.findWWWDir()
+        import("./store/www/index.html.builder.mjs")
+            .then(m => writeFileSync(join(wwwDir, "index.html"), String(m.default)))
+            .catch(console.error)
     },
 
     setup: function () {
         const wwwDir = this.findWWWDir()
         if (!wwwDir) return
-        const p = join(wwwDir, "package.json"), c = join(wwwDir, "phloe.mjs")
-        rmSync(p, rmOps)
+
+        const c = join(wwwDir, "phloe.mjs")
         rmSync(c, rmOps)
-        copyFileSync(this.files.packageJson, p, constants.COPYFILE_FICLONE)
         copyFileSync(this.files.phloemjs, c, constants.COPYFILE_FICLONE)
     },
 
@@ -77,24 +81,21 @@ module.exports = exports = {
         return webApp
     },
 
-    buildOne: function (filePath) {
-        const wwwDir = this.findWWWDir()
-        if (!wwwDir) return
-
-        console.log("Build:", filePath)
-
-        return import(join("www", filePath))
-            .then(m => writeFile(join(wwwDir, filePath.slice(0, -BuilderSuffix.length)), String(m.default)))
-            .catch(console.log)
+    buildByBuilder: function (filePath) {
+        const outPath = filePath.slice(0, -BuilderSuffix.length)
+        console.log("@Phloemjs: Build:", outPath)
+        return import(filePath).then(m => writeFileSync(outPath, String(m.default))).catch(console.error)
     },
 
-    build: function () {
-        const wwwDir = this.findWWWDir()
-        if (!wwwDir) return
+    buildInDirectory: function (dirPath) {
+        if (!dirPath) dirPath = this.findWWWDir()
+        if (!dirPath) return
 
-        return Promise.allSettled(readdirSync(wwwDir, readdirSyncOps)
+        return Promise.allSettled(readdirSync(dirPath, readdirSyncOps)
             .filter(_endsWith, BuilderSuffix)
-            .map(this.buildOne, wwwDir))
+            .filter(p => !p.split(sep).includes("node_modules"))
+            .map(p => join(dirPath, p))
+            .map(this.buildByBuilder, this))
     }
 
 }

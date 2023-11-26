@@ -9,7 +9,7 @@ class StringAr {
  _r(S) { S.add(this.r); Object.values(this.$).forEach(_r, S) }
  HTMLgetRequireList(L, L1) { var l1 = (L1 || (L1 = new Set())).size; this._r(L1); if ((l1 -= L1.size) < 0) { var l = (L || (L = new Set())).size;[...L1].slice(l1).forEach(SSaE, L); if ((l -= L.size) < 0) return [...L].slice(l) } return [] }
  _f() { return this._.map(_f, this.$) }
- toString(S) { return this._f().flat(Infinity).join(S0) }
+ toString() { return this._f().flat(Infinity).join(S0) }
  clone($) { return new this.constructor(this, $) }
 }
 const pRe = /({{[\S]+?}})/g, SA = StringAr,
