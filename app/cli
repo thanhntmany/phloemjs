@@ -8,28 +8,6 @@ const { isAbsolute, join } = require("node:path"),
 const App = require("."), args = process.argv.slice(2)
 var arg
 while (arg = args.shift()) {
-    if (arg.startsWith("--")) {
-        if (arg.length === 2) continue
-        if (arg.startsWith("--working-directory=")) {
-            App.setWD(arg.substring("--working-directory=".length))
-            continue
-        }
-        else {
-            console.warn(`'Option ${arg}' is unrecognizable.`)
-            break
-        }
-    }
-    else if (arg.startsWith("-")) {
-        if (arg === "-wd") {
-            App.setWD(args.shift())
-        }
-        else {
-            console.warn(`'${arg}' is not a phloemjs option.`)
-            break
-        }
-        continue
-    }
-
     if (arg === "init") {
         App.init()
     }
@@ -56,6 +34,9 @@ while (arg = args.shift()) {
             }
             else console.warn(`Could not load builder from "${p}"`)
         }
+    }
+    else if (arg === "--") {
+        continue
     }
     else {
         console.warn(`'${arg}' is not a phloemjs command.`)

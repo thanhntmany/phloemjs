@@ -12,13 +12,6 @@ const BuilderSuffix = ".builder.mjs",
 module.exports = exports = {
     wd: process.cwd(),
     wwwDir: undefined,
-    port: 3080,
-
-    setWD: function (p) {
-        this.wd = isAbsolute(p) ? p : join(this.wd, p)
-        this.wwwDir = undefined
-        return this
-    },
 
     findWWWDir: function () {
         if (this.wwwDir) return this.wwwDir
@@ -30,17 +23,8 @@ module.exports = exports = {
         }
         while (wd !== (wd = dirname(wd)))
 
-        console.error(`www package directory is not found from the current folder.\nLocation into initialized project or init new one by below command first:\n\n    phloemjs init\n`)
+        console.error(`"www" package directory is not found from the current folder.\nLocation into initialized project or init new one by below command first:\n\n    phloemjs init\n`)
         return undefined
-    },
-
-    setPort: function (p) {
-        this.port = p
-        return this
-    },
-
-    files: {
-        phloemjs: join(__dirname, "store", "www", "phloe.mjs")
     },
 
     init: function () {
@@ -61,7 +45,7 @@ module.exports = exports = {
 
         const c = join(wwwDir, "phloe.mjs")
         rmSync(c, rmOps)
-        copyFileSync(this.files.phloemjs, c, constants.COPYFILE_FICLONE)
+        copyFileSync(join(__dirname, "store", "www", "phloe.mjs"), c, constants.COPYFILE_FICLONE)
     },
 
     createStaticWebServer: function () {
@@ -73,13 +57,22 @@ module.exports = exports = {
     },
 
     run: function () {
-        this.findWWWDir()
+        if (!this.findWWWDir()) return;
+
         const webApp = this.createStaticWebServer()
         webApp.listen(this.port, () => {
             console.log(`--> http://localhost:${this.port}`)
         });
         return webApp
     },
+
+    port: 3080,
+
+    setPort: function (p) {
+        this.port = p
+        return this
+    },
+
 
     buildByBuilder: function (filePath) {
         const outPath = filePath.slice(0, -BuilderSuffix.length)

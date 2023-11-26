@@ -3,7 +3,7 @@
 This framework is built with the idea that we stil work based on available platform. (Browsers, Devices, Network topology...)
 
 
-## Installing phloemjs
+### Installing phloemjs
 ```bash
 npm install -g https://github.com/thanhntmany/phloemjs
 ```
@@ -15,40 +15,34 @@ phloemjs init
 phloemjs run
 ```
 
-## CLI
+## CLI Usages
 
 ```bash
-phloemjs [options] <command>
+phloemjs <command>...
 
-Options:
-    -wd <directory>|--working-directory=<directory>
-                          Select working directory (default: current working directory)
 Commands:
-    init                  Initialize project
-    run [-p <port>]       Run static website (on <port>, default: 3080)
-    build [<pathspec>...] Scan and render by builders (*.builder.mjs)
+    init                        Initialize project
+    run [-p <port>]             Run static website (on <port>, default: 3080)
+    build [<pathspec>...] [--]  Scan and render by builders (*.builder.mjs)
 ```
 
-## 2-Side (Backend + Frontend)
+## 2-Side (Backend + Frontend): "www/phloe.mjs"
 
+*ESM*
 ```javascript
-/* @ModuleID: "www/phloe.mjs" */
-
-
-// ESM
 import phloemjs from "www/phloe.mjs";
-// operations
+```
 
-
-// Dynamic Import
+*Dynamic Import*
+```javascript
 import("www/phloe.mjs").then((phloemjs_module) => {
     const phloemjs = phloemjs_module.default
     // operations
 });
 ```
 
+*Frontend (Browser)*
 ```html
-<!-- Frontend (Browser) -->
 <head>
   <script type="importmap">{"imports": {"www/": "/"}}</script>
   <script type="module" src="/phloe.mjs"></script>
@@ -120,26 +114,37 @@ phloemjs.HTML
 [WIP]
 
 
-## Just in Backend
+## Just in Backend: "phloemjs/phloe.mjs"
+
+*ESM*
 ```javascript
-/* @ModuleID: "phloemjs/phloe.mjs" */
-
-
-// ESM
-import phloemjs from "phloemjs/phloe.mjs";
-// operations
-
-
-// Dynamic Import
-import("www/phloe.mjs").then((phloemjs_module) => {
-    const phloemjs = phloemjs_module.default
-    // operations
-});
-
+import { HTMLAr, StringAr } from "phloemjs/phloe.mjs";
 ```
 
-### HTMLAr
+*Dynamic Import*
 ```javascript
-const { HTMLAr } = phloemjs;
-// #TODO: test and add example here
+import("www/phloe.mjs").then((phloemjs_module) => {
+    const { HTMLAr, StringAr } = phloemjs_module
+    // operations
+});
+```
+
+### HTMLAr:
+A subclass of StringAr. It is specifically used for generating HTML raw code. I will adde necessary tags in to output HTML code automatically.
+```javascript
+import { HTMLAr } from "phloemjs/phloe.mjs"
+
+const templ = new HTMLAr(`<html>
+<head></head>
+<body></body>
+</html>`)
+
+console.log("" + templ)
+
+/** output
+<html>
+<head><script type="importmap">{"imports": {"www/": "/"}}</script><script type="module" src="/phloe.mjs"></script></head>
+<body></body>
+</html>
+*/
 ```
