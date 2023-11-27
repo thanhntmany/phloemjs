@@ -29,7 +29,7 @@ module.exports = exports = {
 
     init: function () {
         require('child_process').execSync(
-            `npm init -y && npm i ${dirname(__dirname)} && mkdir -p app/www && npm init -y -w ./app/www`,
+            `npm init -y && npm i phloemjs && mkdir -p app/www && npm init -y -w ./app/www`,
             { cwd: this.wd }
         )
         this.setup()
