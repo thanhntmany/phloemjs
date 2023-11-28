@@ -1,5 +1,5 @@
 'use strict'
-const { dirname, isAbsolute, join, sep } = require('node:path'),
+const { dirname, join, sep } = require('node:path'),
     { constants, copyFileSync, statSync, readdirSync, realpathSync, rmSync, writeFileSync } = require('node:fs'),
     readdirSyncOps = { recursive: true },
     rmOps = { force: true },
@@ -76,7 +76,7 @@ module.exports = exports = {
 
     buildByBuilder: function (filePath) {
         const outPath = filePath.slice(0, -BuilderSuffix.length)
-        console.log("@Phloemjs: Build:", outPath)
+        console.log("@Build:", outPath)
         return import(filePath).then(m => writeFileSync(outPath, String(m.default))).catch(console.error)
     },
 
