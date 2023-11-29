@@ -5,8 +5,7 @@ const { dirname, join, sep } = require('node:path'),
     rmOps = { force: true },
     statSyncOps = { throwIfNoEntry: false }
 
-const BuilderSuffix = ".builder.mjs",
-    _endsWith = function (e) { return e.endsWith(this) }
+const BuilderSuffix = ".builder.mjs", BathBuilderSuffix = ".bath-builder.mjs"
 
 
 module.exports = exports = {
@@ -73,9 +72,13 @@ module.exports = exports = {
         return this
     },
 
+    buildByBathBuilder: function (filePath) {
+        console.log("@Bath builder:", filePath)
+        return import(filePath).then(m => m.default()).catch(console.error)
+    },
 
     buildByBuilder: function (filePath) {
-        const outPath = filePath.slice(0, -BuilderSuffix.length)
+        const outPath = filePath.endsWith(BuilderSuffix) ? filePath.slice(0, -BuilderSuffix.length) : filePath
         console.log("@Build:", outPath)
         return import(filePath).then(m => writeFileSync(outPath, String(m.default))).catch(console.error)
     },
@@ -85,10 +88,12 @@ module.exports = exports = {
         if (!dirPath) return
 
         return Promise.allSettled(readdirSync(dirPath, readdirSyncOps)
-            .filter(_endsWith, BuilderSuffix)
             .filter(p => !p.split(sep).includes("node_modules"))
-            .map(p => join(dirPath, p))
-            .map(this.buildByBuilder, this))
+            .map(p => {
+                if (p.endsWith(BuilderSuffix)) return this.buildByBuilder(join(dirPath, p));
+                if (p.endsWith(BathBuilderSuffix)) return this.buildByBathBuilder(join(dirPath, p));
+                return true
+            }))
     }
 
 }

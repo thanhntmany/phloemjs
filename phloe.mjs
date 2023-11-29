@@ -1,10 +1,14 @@
 import phloemjs from "./app/store/www/phloe.mjs"
 import { fileURLToPath } from 'node:url'
-import { readFileSync as _readFileSync } from "node:fs"
+import { readFileSync, writeFileSync } from "node:fs"
 const readFileSyncOps = { encoding: "UTF-8" }
 
 export function readFileSyncFromUrl(url, options) {
-    return _readFileSync(fileURLToPath(url), Object.assign({}, readFileSyncOps, options))
+    return readFileSync(fileURLToPath(url), Object.assign({}, readFileSyncOps, options))
+}
+
+export function writeFileSyncToUrl(url, data) {
+    return writeFileSync(fileURLToPath(url), data)
 }
 
 const isObject = item => item && typeof item === 'object' && !Array.isArray(item);
